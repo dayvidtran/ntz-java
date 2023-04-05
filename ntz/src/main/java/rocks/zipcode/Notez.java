@@ -8,8 +8,9 @@ public final class Notez {
     private FileMap filemap;
 
     public Notez() {
-        this.filemap  = new FileMap();
+        this.filemap = new FileMap();
     }
+
     /**
      * Says hello to the world.
      *
@@ -21,7 +22,7 @@ public final class Notez {
         if (_debug) {
             System.err.print("Argv: [");
             for (String a : argv) {
-                System.err.print(a+" ");
+                System.err.print(a + " ");
             }
             System.err.println("]");
         }
@@ -47,21 +48,33 @@ public final class Notez {
         } else {
             if (argv[0].equals("-r")) {
                 ntzEngine.addToCategory("General", argv);
-            } else {
+            } else if (argv[0].equals("-c")) {
+                ntzEngine.addToCategory(argv[1], argv);
+            } else if (argv[0].equals("-f")) {
+                ntzEngine.forgetNote(argv[1], Integer.parseInt(argv[2]) - 1);
+            } else if (argv[0].equals("-e")) {
+                ntzEngine.editNotes(argv[1], Integer.parseInt(argv[2]), "");
 
-                // this should give you an idea about how to TEST the Notez engine
             }
-              // without having to spend lots of time messing with command line arguments.
-        }
-        ntzEngine.saveDatabase();
 
+
+            // this should give you an idea about how to TEST the Notez engine
         }
-        /*
-         * what other method calls do you need here to implement the other commands??
-         */
+        // without having to spend lots of time messing with command line arguments.
+        ntzEngine.saveDatabase();
+    }
+
+    /*
+     * what other method calls do you need here to implement the other commands??
+     */
 
     private void addToCategory(String category, String[] argv) {
-        filemap.get(category).add(argv[1]);
+        if (filemap.containsKey(category)) {
+            filemap.get(category).add(argv[argv.length - 1]);
+        } else {
+            filemap.put(category, new NoteList(argv[argv.length - 1]));
+        }
+        filemap.get(category).add(argv[argv.length - 1]);
     }
 
     private void saveDatabase() {
@@ -82,8 +95,23 @@ public final class Notez {
         filemap.put("category3", new NoteList("Did you buy bread AND eggs?"));
         filemap.put("anotherNote", new NoteList("Hello from ZipCode!"));
     }
+
     /*
      * Put all your additional methods that implement commands like forget here...
      */
+    public void forgetNote(String category, int index) {
+        if (filemap.containsKey(category)) {
+            filemap.get(category).remove(index);
+            if (filemap.get(category).size() == 0) {
+                filemap.remove(category);
+            }
+        }
+
+    }
+
+    public void editNotes(String category, int index, String newMsg) {
+
+    }
 
 }
+
